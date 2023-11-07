@@ -1,0 +1,683 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="openApiManage">
+
+	<select id="selectTableInfoList"  parameterType="Map" resultType="Map">
+		/*queryID = openApiManage.selectTableInfoList */
+		<![CDATA[
+		SELECT TABLE_CD          as tableCd          
+			 , TABLE_GUBUN_CD    as tableGubunCd    
+			 , TABLE_NAME        as tableName        
+			 , TABLE_SPEC        as tableSpec        
+			 , ATCH_FILE_ID	     as tableImageAll        
+			 /*, TABLE_DESCRIPTION as tableDescription 
+			 , TABLE_IMAGE_LARGE as tableImageLarge 
+			 , TABLE_THUMBNAIL1  as tableThumbnail1  
+			 , TABLE_THUMBNAIL2  as tableThumbnail2  
+			 , TABLE_THUMBNAIL3  as tableThumbnail3  
+			 , TABLE_THUMBNAIL4  as tableThumbnail4  
+			 , TABLE_THUMBNAIL5  as tableThumbnail5 */  
+			 , TABLE_BIGO        as tableBigo        
+			 , USE_YN            as useYn            
+			 , FIRST_REGIST_ID   as firstRegistId   
+			 , FIRST_REGIST_DATE as firstRegistDate 
+			 , LAST_MODIFY_ID    as lastModifyId    
+			 , LAST_MODIFY_DATE  as lastModifyDate  
+		  FROM TABLE_INFO
+		 WHERE USE_YN = 'Y'
+		]]>
+		<if test="tableGubunCd != null and tableGubunCd != ''">
+			AND TABLE_GUBUN_CD = #{tableGubunCd}
+		</if>
+		<![CDATA[
+		 ORDER BY TABLE_GUBUN_CD ASC, TABLE_CD ASC
+		]]>
+	</select>
+
+	<select id="selectPensionInfoList"  parameterType="Map" resultType="Map">
+		/*queryID = openApiManage.selectPensionInfoList */
+		<![CDATA[
+		SELECT PENSION_CD          as pensionCd          
+			 , PENSION_NAME        as pensionName        
+			 , PENSION_SPEC        as pensionSpec        
+			 , ATCH_FILE_ID        as pentionImageAll        
+			 /*, PENSION_DESCRIPTION as pensionDescription 
+			 , PENSION_IMAGE_LARGE as pensionImage_large 
+			 , PENSION_THUMBNAIL1  as pensionThumbnail1  
+			 , PENSION_THUMBNAIL2  as pensionThumbnail2  
+			 , PENSION_THUMBNAIL3  as pensionThumbnail3  
+			 , PENSION_THUMBNAIL4  as pensionThumbnail4  
+			 , PENSION_THUMBNAIL5  as pensionThumbnail5 */  
+			 , PENSION_BIGO        as pensionBigo        
+			 , USE_YN              as useYn              
+			 , FIRST_REGIST_ID     as firstRegistId     
+			 , FIRST_REGIST_DATE   as firstRegistDate   
+			 , LAST_MODIFY_ID      as lastModifyId      
+			 , LAST_MODIFY_DATE    as lastModifyDate    
+		  FROM PENSION_INFO
+		 WHERE USE_YN = 'Y'
+		 ORDER BY PENSION_CD ASC, PENSION_NAME ASC
+		]]>
+	</select>
+	
+	<select id="selectReserveTblCntList" parameterType="Map" resultType="Map">
+		/*queryID = openApiManage.selectReserveTblCntList */
+		<![CDATA[
+		SELECT DATE_FORMAT(A.RSV_START_DATE, '%Y%m%d') as rsvStartDate
+			 , A.TABLE_GUBUN_CD as tableGubunCd
+			 , COUNT(A.TABLE_CD) as rsvCnt
+			 , B.totCnt as totCnt
+		  FROM RSVTABLE A , 
+		  	   (
+		  	   	SELECT TABLE_GUBUN_CD, COUNT(TABLE_CD) as totCnt
+				  FROM TABLE_INFO
+				 GROUP BY TABLE_GUBUN_CD 
+			   ) B
+		 WHERE A.TABLE_GUBUN_CD = B.TABLE_GUBUN_CD
+		   AND DATE_FORMAT(A.RSV_START_DATE, '%Y%m%d') >= #{ymd} 
+		 GROUP BY A.RSV_START_DATE, A.TABLE_GUBUN_CD 
+		 ORDER BY A.RSV_START_DATE, A.TABLE_GUBUN_CD 
+		]]>
+	</select>
+	
+	<select id="selectReservePensionCntList" parameterType="Map" resultType="Map">
+		/*queryID = openApiManage.selectReservePensionCntList */
+		<![CDATA[
+		SELECT DATE_FORMAT(A.RSV_START_DATE, '%Y%m%d') as rsvStartDate
+			 , COUNT(A.RSV_DONG_CD) as rsvDongCnt
+			 , COUNT(A.RSV_ROOM_CD) as rsvRoomCnt
+			 , B.totCnt as totCnt
+		  FROM RESERVE A , 
+		  	   (
+		  	   	SELECT COUNT(PENSION_CD) as totCnt
+				  FROM PENSION_INFO
+			   ) B
+		 WHERE A.RSV_TABLENPENSION_GUBUN = '1'
+		   AND DATE_FORMAT(A.RSV_START_DATE, '%Y%m%d') >= #{ymd} 
+		 GROUP BY A.RSV_START_DATE 
+		]]>
+	</select>
+
+	<select id="selectTableInfo"  parameterType="Map" resultType="Map">
+		/*queryID = openApiManage.selectTableInfo */
+		<![CDATA[
+		SELECT TABLE_CD          as tableCd          
+			 , TABLE_GUBUN_CD    as tableGubunCd    
+			 , TABLE_NAME        as tableName        
+			 , TABLE_SPEC        as tableSpec
+			 , ATCH_FILE_ID 	 as tableImageAll        
+			 /*, TABLE_DESCRIPTION as tableDescription 
+			 , TABLE_IMAGE_LARGE as tableImageLarge 
+			 , TABLE_THUMBNAIL1  as tableThumbnail1  
+			 , TABLE_THUMBNAIL2  as tableThumbnail2  
+			 , TABLE_THUMBNAIL3  as tableThumbnail3  
+			 , TABLE_THUMBNAIL4  as tableThumbnail4  
+			 , TABLE_THUMBNAIL5  as tableThumbnail5 */  
+			 , TABLE_BIGO        as tableBigo        
+			 , USE_YN            as useYn            
+			 , FIRST_REGIST_ID   as firstRegistId   
+			 , FIRST_REGIST_DATE as firstRegistDate 
+			 , LAST_MODIFY_ID    as lastModifyId    
+			 , LAST_MODIFY_DATE  as lastModifyDate  
+		  FROM TABLE_INFO
+		 WHERE USE_YN = 'Y'
+		]]>
+		<if test="tableCd != null and tableCd != ''" >
+			AND TABLE_CD = #{tableCd}
+		</if>
+	</select>
+
+	<select id="selectPensionInfo"  parameterType="Map" resultType="Map">
+		/*queryID = openApiManage.selectPensionInfo */
+		<![CDATA[
+		SELECT PENSION_CD          as pensionCd          
+			 , PENSION_NAME        as pensionName  
+			 , PENSION_PERSON_CNT  as pensionPersonCnt
+			 , PENSION_MAX_CNT	   as pensionMaxCnt      
+			 , PENSION_SPEC        as pensionSpec        
+			 , ATCH_FILE_ID        as pensionImageAll        
+			 /*, PENSION_DESCRIPTION as pensionDescription 
+			 , PENSION_IMAGE_LARGE as pensionImage_large 
+			 , PENSION_THUMBNAIL1  as pensionThumbnail1  
+			 , PENSION_THUMBNAIL2  as pensionThumbnail2  
+			 , PENSION_THUMBNAIL3  as pensionThumbnail3  
+			 , PENSION_THUMBNAIL4  as pensionThumbnail4  
+			 , PENSION_THUMBNAIL5  as pensionThumbnail5 */  
+			 , PENSION_BIGO        as pensionBigo        
+			 , USE_YN              as useYn              
+			 , FIRST_REGIST_ID     as firstRegistId     
+			 , FIRST_REGIST_DATE   as firstRegistDate   
+			 , LAST_MODIFY_ID      as lastModifyId      
+			 , LAST_MODIFY_DATE    as lastModifyDate    
+		  FROM PENSION_INFO
+		 WHERE USE_YN = 'Y'
+		]]>
+		<if test="pensionCd != null and pensionCd != ''" >
+			AND PENSION_CD = #{pensionCd}
+		</if>
+	</select>
+
+	<select id="selectFileList"  parameterType="Map" resultType="Map">
+		/*queryID = contentsManage.selectFileList*/
+		<![CDATA[
+		SELECT D.FILE_SEQ as fileSeq
+			 , D.ORG_FILE_NM as orgFileNm
+			 , D.STRE_FILE_URL as streFileUrl
+		  FROM ATCH_FILE_INFO A, ATCH_FILE_DETAIL D 
+		 WHERE A.ATCH_FILE_ID = #{atchFileId}
+		   AND A.ATCH_FILE_ID = D.ATCH_FILE_ID
+		]]>
+	</select>
+
+	<select id="selectTableComment"  parameterType="Map" resultType="Map">
+		/*queryID = openApiManage.selectTableComment */
+		<include refid="common.pagingPre"/>
+		<![CDATA[
+		SELECT TABLE_CD          as tableCd          
+			 , COMMENT_SEQ       as commentSeq       
+			 , PARENT_SEQ        as parentSeq        
+			 , CHILD_SEQ         as childSeq         
+			 , WRITER_NAME       as writerName       
+			 , COMMENT_SUBJECT   as commentSubject   
+			 , DESCR             as descr             
+			 , FIRST_REGIST_ID   as firstRegistId   
+			 , FIRST_REGIST_DATE as firstRegistDate 
+			 , LAST_MODIFY_ID    as lastModifyId    
+			 , LAST_MODIFY_DATE  as lastModifyDate  
+		  FROM TABLE_COMMENT
+		 WHERE TABLE_CD = #{pensionCd}
+		]]>
+		<include refid="common.pagingPost"/>
+	</select>
+
+	<insert id="insertReserveInfo" parameterType="Map" >
+		/*queryID = openApiManage.insertReserveInfo */
+		<![CDATA[
+		INSERT INTO RESERVE (
+			RSV_ID              /* 예약 ID(orderNumber) */
+			, CUST_NAME         /* 예약자명 */
+			, CUST_MOBILE       /* 예약자 휴대폰번호 (이니시스 결제에서도 입력 받지만 그건 이니시스에서 문자를 보내기 위함) */
+			, CUST_EMAIL        /* 예약자 이메일 (이니시스 결제에서도 입력 받지만 그건 이니시스에서 메일을 보내기 위함) */
+			, RSV_AUDLT_CNT     /* 예약인원수(성인) */
+			, RSV_CHILD_CNT     /* 예약인원수(아동) */
+			, RSV_TABLENPENSION_GUBUN /*테이블과 펜션의 구분(0:테이블, 1:펜션)*/
+			, RSV_TABLE_CNT     /* 예약테이블수(펜션의 경우 사용하지 않음) */
+			, RSV_DONG_CD       /* 펜션의 홀(동) 코드 */
+			, RSV_ROOM_CD       /* 펜션의 호실(방) 코드 */
+			, RSV_APPEND_CNT    /* 펜션의 추가인원 수 */
+			, RSV_START_DATE    /* 예약시작일 */
+			, RSV_END_DATE      /* 예약종료일 */
+			, RSV_SPECIAL_BIGO  /* 비고 */
+			, PAY_AMT           /* 금액 */
+			, PAY_VAT           /* 부가세 */
+			, COMP_PAY          /* 결제완료 여부(0:결제완료, 1:결제대기중(무통장입금의 경우), 이니시스 승인상태에 따라 추가) */
+			, FIRST_REGIST_ID   /* 최초등록자ID */
+			, FIRST_REGIST_DATE /* 최초등록일자 */
+			, LAST_MODIFY_ID    /* 최종등록자ID */
+			, LAST_MODIFY_DATE  /* 최종등록일자 */
+		)
+		VALUES (
+			#{orderNumber}
+			, #{reserveName}
+			, #{reserveTel}
+			, #{reserveEmail}
+			, #{reserveAdult}
+			, #{reserveChildren}
+			, #{reserveTableNPensionGubun}
+			, #{reserveTableCnt}
+			, #{reservePensionCd}
+			, #{reservePensionCd}
+			, CAST(#{reserveAppendCnt} as unsigned)
+			, #{reserveStartDate}
+			, #{reserveEndDate}
+			, #{bigo}
+			, #{payAmt}
+			, #{payVat}
+			, 1 
+			, #{userId}
+			, SYSDATE()
+			, #{userId}
+			, SYSDATE()
+		)
+		]]>
+	    <selectKey keyProperty="rsvId" resultType="String" order="AFTER">
+	        SELECT MAX(RSV_ID) FROM RESERVE
+	    </selectKey>
+	</insert>
+
+	<insert id="insertOrder_Old" parameterType="Map">
+		/*queryID = openApiManage.insertOrder_Old */
+		<![CDATA[
+	    INSERT INTO ORDER_MENU (
+			RSV_ID
+	    	, MENU_GUBUN_CD
+	    	, MENU_CD
+	    	, MENU_CNT
+	    	, RSV_START_DATE
+	    	, RSV_END_DATE
+	    )
+	    VALUES 
+		]]>
+	    <foreach collection="menu" item="item" separator=",">
+		<![CDATA[
+	    (
+	        #{orderNumber}
+	        , #{item.menuGubunCd}
+	        , #{item.menuCd}
+	        , #{item.menuCnt}
+	        , #{item.reserveStartDate}
+	        , #{item.reserveEndDate}
+	    )
+		]]>
+	    </foreach>
+	</insert>
+
+	<insert id="insertOrderMenu" parameterType="Map">
+		/*queryID = openApiManage.insertOrderMenu */
+		<![CDATA[
+	    INSERT INTO ORDER_MENU (
+			RSV_ID
+	    	, MENU_GUBUN_CD
+	    	, MENU_CD
+	    	, MENU_CNT
+	    	, MENU_UNIT_PRICE
+	    	, RSV_START_DATE
+	    	, RSV_END_DATE
+	    )
+	    VALUES (
+	        #{orderNumber}
+	        , #{menuGubunCd}
+	        , #{menuCd}
+	        , #{menuCnt}
+	        , #{menuUnitPrice}
+	        , DATE_FORMAT(#{reserveStartDate}, '%Y-%m-%d')
+	        , DATE_FORMAT(#{reserveEndDate}, '%Y-%m-%d')
+	    )
+		]]>
+	</insert>
+
+	<insert id="insertRsvTable" parameterType="Map">
+		/*queryID = openApiManage.insertRsvTable */
+		<![CDATA[
+	    INSERT INTO RSVTABLE (
+	    	RSV_ID				/*예약ID(orderNumber) */
+			, TABLE_GUBUN_CD	/*10:일반테이블, 11:평상테이블, 12:애견동반테이블*/
+			, TABLE_CD			/*테이블코드(tabel_info의코드)*/
+			, RSV_START_DATE 	/*예약시작일*/
+			, RSV_END_DATE		/*예약종료일*/
+	    )
+	    VALUES (
+	        #{orderNumber}
+	        , #{tableGubunCd}
+	        , #{tableCd}
+	        , DATE_FORMAT(#{rsvStartDate}, '%Y-%m-%d')
+	        , DATE_FORMAT(#{rsvEndDate}, '%Y-%m-%d')
+	    )
+		]]>
+	</insert>
+
+	<select id="selectRsvTableMax" parameterType="Map" resultType="Map">
+		/*queryID = openApiManage.selectRsvTableMax*/
+		<![CDATA[
+		SELECT IFNULL(
+	   				(
+						SELECT min(A.TABLE_CD)
+						  FROM TABLE_INFO A
+						 WHERE A.TABLE_CD > #{tableCd}
+						   AND A.TABLE_GUBUN_CD = #{tableGubunCd}
+						   AND A.TABLE_CD NOT IN (
+								SELECT TABLE_CD
+								  FROM RSVTABLE R
+								 WHERE DATE_FORMAT(R.RSV_START_DATE, '%Y-%m-%d') >= #{rsvStartDate}
+								   AND DATE_FORMAT(R.RSV_END_DATE, '%Y-%m-%d') <= #{rsvEndDate}
+					   		   )
+				   ), (
+						SELECT max(A.TABLE_CD)
+						  FROM TABLE_INFO A
+						 WHERE A.TABLE_CD < #{tableCd}
+						   AND A.TABLE_GUBUN_CD = #{tableGubunCd}
+						   AND A.TABLE_CD NOT IN (
+								SELECT TABLE_CD
+								  FROM RSVTABLE R
+								 WHERE DATE_FORMAT(R.RSV_START_DATE, '%Y-%m-%d') >= #{rsvStartDate}
+								   AND DATE_FORMAT(R.RSV_END_DATE, '%Y-%m-%d') <= #{rsvEndDate}
+						   	   )
+					 )
+		   		) as tableCd
+		]]>
+	</select>
+
+	<insert id="insertPaymentTable" parameterType="Map">
+		/*queryID = openApiManage.insertPaymentTable*/
+		<![CDATA[
+		INSERT INTO PAYMENT (
+			RSV_ID									/* varchar(40)  주문번호(orderNumber)                                                                                        */
+			, INICIS_RESULT_CODE	                /* varchar(6)	이니시스 승인 결과코드	false	[NULL]	[NULL]                                                                 */
+			, INICIS_RESULT_MSG	                	/* varchar(100)	이니시스 승인 결과메시지	false	[NULL]	[NULL]                                                                 */
+			, INICIS_TID			                /* varchar(40)	이니시스 거래번호	false	[NULL]	[NULL]                                                                     */
+			, INICIS_MID			                /* varchar(10)	이니시스 상점아이디	false	[NULL]	[NULL]                                                                     */
+			, INICIS_MOID			                /* varchar(40)	이니시스 주문번호	false	[NULL]	[NULL]                                                                     */
+			, INICIS_TOPRICE		                /* int(20)		이니시스 결제금액	false	[NULL]	[NULL]                                                                     */
+			, INICIS_GOODNAME		                /* varchar(40)	이니시스 상품명	false	[NULL]	[NULL]                                                                         */
+			, INICIS_PAYMETHOD	                	/* varchar(100)	이니시스 지불수단코드(HPP(1):blow1000:Card:VBank: ...)	false	[NULL]	[NULL]                                 */
+			, INICIS_APPLDATE		                /* varchar(8)	이니시스 승인일자(YYYYMMDD)	false	[NULL]	[NULL]                                                             */
+			, INICIS_APPLTIME		                /* varchar(6)	이니시스 승인시간(hh24miss)	false	[NULL]	[NULL]                                                             */
+			, INICIS_EVENTCODE	                	/* varchar(2)	이니시스 이벤트코드,카드할부 및 행사적용코드	false	[NULL]	[NULL]                                                 */
+			, INICIS_BUYERNAME	                	/* varchar(30)	이니시스 구매자명	false	[NULL]	[NULL]                                                                     */
+			, INICIS_BUYERTEL		                /* varchar(20)	이니시스 구매자휴대폰번호	false	[NULL]	[NULL]                                                                 */
+			, INICIS_BUYEREMAIL	                	/* varchar(60)	이니시스 구매자이메일주소	false	[NULL]	[NULL]                                                                 */
+			, INICIS_CUSTEMAIL	                	/* varchar(60)	이니시스 최종이메일주소	false	[NULL]	[NULL]                                                                 */
+			, INICIS_CARD_APPLNUM	                /* varchar(8)	이니시스 카드 승인번호 *********	false	[NULL]	[NULL]                                                         */
+			, INICIS_CARD_NUM		                /* varchar(16)	이니시스 신용카드 번호	false	[NULL]	[NULL]                                                                 */
+			, INICIS_CARD_INTEREST	            	/* varchar(1)	이니시스 신용카드 상점부담 무이자 할부여부(1:상점부담 무이자)	false	[NULL]	[NULL]                                     */
+			, INICIS_CARD_QUOTA		            	/* varchar(1)	이니시스 신용카드 할부기간	false	[NULL]	[NULL]                                                                 */
+			, INICIS_CARD_CODE		            	/* varchar(2)	이니시스 신용카드사코드	false	[NULL]	[NULL]                                                                 */
+			, INICIS_CARD_CORPFLAG	            	/* varchar(1)	이니시스 신용카드 카드구분(0:개인카드, 1:법인카드, 9:구분불가)	false	[NULL]	[NULL]                                 */
+			, INICIS_CARD_CHECKFLAG	            	/* varchar(1)	이니시스 신용카드 카드종류(0:신용카드, 1:체크카드, 2:기프트카드)	false	[NULL]	[NULL]                                 */
+			, INICIS_CARD_PRTCCODE	            	/* varchar(1)	이니시스 신용카드 부분취소 가능여부(1:가능, 0:불가능)	false	[NULL]	[NULL]                                         */
+			, INICIS_CARD_BANKCODE	            	/* varchar(2)	이니시스 신용카드 카드발급사(은행)코드	false	[NULL]	[NULL]                                                     */
+			, INICIS_CARD_SRCCODE		            /* varchar(2)	이니시스 신용카드 간편(앱)결제구분 코드(C:PAYCO, B:삼성페이, D:삼성페이(체크), G:SSGPAY, O:Kakaopay, ...)	false	[NULL] */
+			, INICIS_CARD_POINT		            	/* varchar(1)	이니시스 신용카드 카드포인트("":포인트사용안함, 1:포인트사용)	false	[NULL]	[NULL]                                     */
+			, INICIS_CARD_USEPOINT	            	/* varchar(12)	이니시스 신용카드 포인트 사용 금액	false	[NULL]	[NULL]                                                         */
+			, INICIS_CARD_COUPONPRICE	            /* int(20)		이니시스 신용카드 살제 카드승인 금액	false	[NULL]	[NULL]                                                         */
+			, INICIS_CARD_COUPONDISCOUNT			/* int(20)		이니시스 신용카드 쿠폰(즉시할인)금액	false	[NULL]	[NULL]                                                         */
+			, INICIS_CARD_NAVERPOINT_USEFREEPOINT	/* varchar(12)	이니시스 신용카드 네이버포인트 무상포인트	false	[NULL]	[NULL]                                                     */
+			, INICIS_CARD_NAVERPOINT_CSHRAPPLYN		/* varchar(1)	이니시스 신용카드 네이버포인트 현금영수증 발행여부(Y:발행, N:미발행)	false	[NULL]	[NULL]                             */
+			, INICIS_CARD_NAVERPOINT_CSHRAPPLAMT	/* varchar(12)	이니시스 신용카드 네이버포인트 현금영수증 발행 금액	false	[NULL]	[NULL]                                             */
+			, INICIS_CARD_PCO_ORDERNO				/* varchar(12)	이니시스 신용카드 페이코 주문번호	false	[NULL]	[NULL]                                                         */
+			, INICIS_CARD_CURRENCY					/* varchar(3)	이니시스 신용카드 통화코드	false	[NULL]	[NULL]                                                                 */
+			, INICIS_CARD_ORGPRICE					/* varchar(30)	이니시스 신용카드 달러환전금액	false	[NULL]	[NULL]                                                             */
+			, INICIS_CSHR_RESULTCODE				/* varchar(6)	이니시스 현금영수증 발행 정상여부(220000:정상)	false	[NULL]	[NULL]                                             */
+			, INICIS_CSHR_APPLNUM					/* varchar(9)	이니시스 현금영수증 발행 승인번호	false	[NULL]	[NULL]                                                         */
+			, INICIS_CSHR_TYPE						/* varchar(1)	이니시스 현금영수증 현금영수증 구분(0:소득공제, 1:지출증빙)	false	[NULL]	[NULL]                                     */
+			, INICIS_ACCT_BANKCODE					/* varchar(2)	이니시스 계좌이체 은행코드	false	[NULL]	[NULL]                                                                 */
+			, INICIS_ACCT_NAME						/* varchar(30)	이니시스 계좌이체 계좌주명	false	[NULL]	[NULL]                                                                 */
+			, INICIS_VACT_NUM						/* varchar(14)	이니시스 가상계좌번호	false	[NULL]	[NULL]                                                                     */
+			, INICIS_VACT_BANKCODE					/* varchar(2)	이니시스 입금은행코드	false	[NULL]	[NULL]                                                                     */
+			, INICIS_VACT_BANKNAME					/* varchar(20)	이니시스 입금은행명	false	[NULL]	[NULL]                                                                     */
+			, INICIS_VACT_NAME						/* varchar(20)	이니시스 예금주명	false	[NULL]	[NULL]                                                                     */
+			, INICIS_VACT_INPUTNAME					/* varchar(20)	이니시스 송금자명(default는 구매자명 값)	false	[NULL]	[NULL]                                                 */
+			, INICIS_VACT_DATE						/* varchar(8)	이니시스 입금기한일자(YYYYMMDD)	false	[NULL]	[NULL]                                                         */
+			, INICIS_VACT_TIME						/* varchar(6)	이니시스 입금기한시각(hhmmss)	false	[NULL]	[NULL]                                                             */
+			, INICIS_HPP_NUM						/* varchar(14)	이니시스 휴대폰 휴대폰번호	false	[NULL]	[NULL]                                                                 */
+			, INICIS_HPP_PAYDEVICE					/* varchar(6)	이니시스 휴대폰 결제장치	false	[NULL]	[NULL]                                                                 */
+		) 
+		VALUES (
+			#{MOID}   								/* 주문번호(orderNumber) */
+			, #{resultCode}							/* 수신결과코드 */
+			, #{resultMsg}							/* 수신메시지 */
+			, #{tid}								/* 거래번호 */
+			, #{mid}								/* 상점아이디 */
+			, #{MOID}								/* 주문번호 (orderNum 과 동일) */
+			, #{TotPrice}							/* 결제금액 */
+			, #{goodsName}							/* 상품명 */
+			, #{payMethod}							/* 지불수단코드*HPP(1):blow1000:Card:VBank:, ... */
+			, #{applDate}							/* 승인일자 (YYYYMMDD) */
+			, #{applTime}							/* 승인시간 (hh24miss) */
+			, #{EventCode}							/* 이벤트코드, 카드할부 및 행사전용코드 */
+			, #{buyerName}							/* 구매자명 */
+			, #{buyerTel}							/* 구매자휴대폰번호 */
+			, #{buyerEmail}							/* 구매자이메일 주소 */
+			, #{custEmail}							/* 최종 이메일 주소 */
+			, #{applNum}							/* 카드승인번호 */
+			, #{CARD_Num}							/* 신용카드 번호 */
+			, #{CARD_Interest}						/* 신용카드 상점부담 무이자 할부 여부(1:상점부담 무이자) */
+			, #{CARD_Quota}							/* 신용카드 할부기간 */
+			, #{CARD_Code}							/* 신용카드사코드 */
+			, #{CARD_CorpFlag}						/* 신용카드 카드구분(0:개인카드, 1:법인카드, 9:구분불가) */
+			, #{CARD_CheckFlag}						/* 신용카드 카드종류(0:신용카드, 1:체크카다, 2:기프트카드) */
+			, #{CARD_PRTC_CODE}						/* 신용카드 부분취소 가능여부(1:가능, 0:불가능) */
+			, #{CARD_BankCode}						/* 카드 발급사(은행)코드 */ 
+			, #{CARD_SrcCode}						/* 신용카드 간편(앱)결제구분 코드(C:PAYCO, B:삼성페이, D:삼성페이(체크), G:SSGPAY, O:Kakaopay, ...) */
+			, #{CARD_Point}							/* 카드 포인트("":포인트사용안함, 1:포인트사용) */
+			, #{CARD_UsePoint}						/* 신용카드 포인트 사용 금액 */
+			, #{CARD_CouponPrice}					/* 신용카드 살제 카드 승인 금액 */
+			, #{CARD_CouponDiscount}				/* 신용카드 쿠폰(즉시할인)금액 */
+			, #{NAVERPOINT_UseFreePoint}			/* 신용카드 네이버포인트 무상포인트 */
+			, #{NAVERPOINT_CSHRApplYN}				/* 신용카드 네이버포인트 현금영수증 발행여부(Y:발행, N:미발행) */
+			, #{NAVERPOINT_CSHRApplAmt}				/* 신용카드 네이버포인트 현금영수증 발행 금액 */
+			, #{PCO_OrderNo}						/* 신용카드 페이코 주문번호 */
+			, #{currency}							/* 신용카드 통화코드 */
+			, #{OrgPrice}							/* 신용카드 달러환전금액 */
+			, #{CSHR_ResultCode} 					/* 현금영수증 발행 정상여부 */
+			, #{CSHR_ApplNum}						/* 현금 영수증 발행 승인번호 */
+			, #{CSHR_Type}							/* 현금영수증 현금영수증구분(0:소득공제, 1:지출증빙)*/
+			, #{ACCT_BankCode}						/* 계좌이체은행코드*/
+			, #{ACCT_Name}							/* 계좌이체 계좌주명 */
+			, #{VACT_Num}							/* 가장계좌번호 */
+			, #{VACT_BankCode}  					/* 입금은행코드 */
+			, #{vactBankName}  						/* 입금은행명 */
+			, #{VACT_Name}							/* 예금주명 */
+			, #{VACT_InputName}						/* 송금자명 */
+			, #{VACT_Date}							/* 입금기한일자(YYYYMMDD) */
+			, #{VACT_Time}							/* 입금기한시각 (hhmmss) */
+			, #{HPP_Num}							/* 휴대폰번호 */
+			, #{payDevice}							/* 휴대폰 걸제장치 */
+		)
+		]]>
+	</insert>
+<!--
+RSV_ID								varchar(40)     주문번호(orderNumber)
+INICIS_RESULT_CODE	                varchar(6)		이니시스 승인 결과코드	false	[NULL]	[NULL]
+INICIS_RESULT_MSG	                varchar(100)	이니시스 승인 결과메시지	false	[NULL]	[NULL]
+INICIS_TID			                varchar(40)		이니시스 거래번호	false	[NULL]	[NULL]
+INICIS_MID			                varchar(10)		이니시스 상점아이디	false	[NULL]	[NULL]
+INICIS_MOID			                varchar(40)		이니시스 주문번호	false	[NULL]	[NULL]
+INICIS_TOPRICE		                int(20)			이니시스 결제금액	false	[NULL]	[NULL]
+INICIS_GOODNAME		                varchar(40)		이니시스 상품명	false	[NULL]	[NULL]
+INICIS_PAYMETHOD	                varchar(100)	이니시스 지불수단코드(HPP(1):blow1000:Card:VBank: ...)	false	[NULL]	[NULL]
+INICIS_APPLDATE		                varchar(8)		이니시스 승인일자(YYYYMMDD)	false	[NULL]	[NULL]
+INICIS_APPLTIME		                varchar(6)		이니시스 승인시간(hh24miss)	false	[NULL]	[NULL]
+INICIS_EVENTCODE	                varchar(2)		이니시스 이벤트코드,카드할부 및 행사적용코드	false	[NULL]	[NULL]
+INICIS_BUYERNAME	                varchar(30)		이니시스 구매자명	false	[NULL]	[NULL]
+INICIS_BUYERTEL		                varchar(20)		이니시스 구매자휴대폰번호	false	[NULL]	[NULL]
+INICIS_BUYEREMAIL	                varchar(60)		이니시스 구매자이메일주소	false	[NULL]	[NULL]
+INICIS_CUSTEMAIL	                varchar(60)		이니시스 최종이메일주소	false	[NULL]	[NULL]
+INICIS_CARD_APPLNUM	                varchar(8)		이니시스 카드 승인번호 *********	false	[NULL]	[NULL]
+INICIS_CARD_NUM		                varchar(16)		이니시스 신용카드 번호	false	[NULL]	[NULL]
+INICIS_CARD_INTEREST	            varchar(1)		이니시스 신용카드 상점부담 무이자 할부여부(1:상점부담 무이자)	false	[NULL]	[NULL]
+INICIS_CARD_QUOTA		            varchar(1)		이니시스 신용카드 할부기간	false	[NULL]	[NULL]
+INICIS_CARD_CODE		            varchar(2)		이니시스 신용카드사코드	false	[NULL]	[NULL]
+INICIS_CARD_CORPFLAG	            varchar(1)		이니시스 신용카드 카드구분(0:개인카드, 1:법인카드, 9:구분불가)	false	[NULL]	[NULL]
+INICIS_CARD_CHECKFLAG	            varchar(1)		이니시스 신용카드 카드종류(0:신용카드, 1:체크카드, 2:기프트카드)	false	[NULL]	[NULL]
+INICIS_CARD_PRTCCODE	            varchar(1)		이니시스 신용카드 부분취소 가능여부(1:가능, 0:불가능)	false	[NULL]	[NULL]
+INICIS_CARD_BANKCODE	            varchar(2)		이니시스 신용카드 카드발급사(은행)코드	false	[NULL]	[NULL]
+INICIS_CARD_SRCCODE		            varchar(2)		이니시스 신용카드 간편(앱)결제구분 코드(C:PAYCO, B:삼성페이, D:삼성페이(체크), G:SSGPAY, O:Kakaopay, ...)	false	[NULL]	[NULL]
+INICIS_CARD_POINT		            varchar(1)		이니시스 신용카드 카드포인트("":포인트사용안함, 1:포인트사용)	false	[NULL]	[NULL]
+INICIS_CARD_USEPOINT	            varchar(12)		이니시스 신용카드 포인트 사용 금액	false	[NULL]	[NULL]
+INICIS_CARD_COUPONPRICE	            int(20)			이니시스 신용카드 살제 카드승인 금액	false	[NULL]	[NULL]
+INICIS_CARD_COUPONDISCOUNT			int(20)			이니시스 신용카드 쿠폰(즉시할인)금액	false	[NULL]	[NULL]
+INICIS_CARD_NAVERPOINT_USEFREEPOINT	varchar(12)		이니시스 신용카드 네이버포인트 무상포인트	false	[NULL]	[NULL]
+INICIS_CARD_NAVERPOINT_CSHRAPPLYN	varchar(1)		이니시스 신용카드 네이버포인트 현금영수증 발행여부(Y:발행, N:미발행)	false	[NULL]	[NULL]
+INICIS_CARD_NAVERPOINT_CSHRAPPLAMT	varchar(12)		이니시스 신용카드 네이버포인트 현금영수증 발행 금액	false	[NULL]	[NULL]
+INICIS_CARD_PCO_ORDERNO				varchar(12)		이니시스 신용카드 페이코 주문번호	false	[NULL]	[NULL]
+INICIS_CARD_CURRENCY				varchar(3)		이니시스 신용카드 통화코드	false	[NULL]	[NULL]
+INICIS_CARD_ORGPRICE				varchar(30)		이니시스 신용카드 달러환전금액	false	[NULL]	[NULL]
+INICIS_ACCT_BANKCODE				varchar(2)		이니시스 계좌이체 은행코드	false	[NULL]	[NULL]
+INICIS_CSHR_RESULTCODE				varchar(6)		이니시스 현금영수증 발행 정상여부(220000:정상)	false	[NULL]	[NULL]
+INICIS_CSHR_APPLNUM					varchar(9)		이니시스 현금영수증 발행 승인번호	false	[NULL]	[NULL]
+INICIS_CSHR_TYPE					varchar(1)		이니시스 현금영수증 현금영수증 구분(0:소득공제, 1:지출증빙)	false	[NULL]	[NULL]
+INICIS_ACCT_NAME					varchar(30)		이니시스 계좌이체 계좌주명	false	[NULL]	[NULL]
+INICIS_VACT_NUM						varchar(14)		이니시스 가상계좌번호	false	[NULL]	[NULL]
+INICIS_VACT_BANKCODE				varchar(2)		이니시스 입금은행코드	false	[NULL]	[NULL]
+INICIS_VACT_BANKNAME				varchar(20)		이니시스 입금은행명	false	[NULL]	[NULL]
+INICIS_VACT_NAME					varchar(20)		이니시스 예금주명	false	[NULL]	[NULL]
+INICIS_VACT_INPUTNAME				varchar(20)		이니시스 송금자명(default는 구매자명 값)	false	[NULL]	[NULL]
+INICIS_VACT_DATE					varchar(8)		이니시스 입금기한일자(YYYYMMDD)	false	[NULL]	[NULL]
+INICIS_VACT_TIME					varchar(6)		이니시스 입금기한시각(hhmmss)	false	[NULL]	[NULL]
+INICIS_HPP_NUM						varchar(14)		이니시스 휴대폰 휴대폰번호	false	[NULL]	[NULL]
+INICIS_HPP_PAYDEVICE				varchar(6)		이니시스 휴대폰 결제장치	false	[NULL]	[NULL]
+-->
+
+	<update id="updateReserveTable" parameterType="Map">
+		/*queryID = openApiManage.updateReserveTable*/
+		<![CDATA[
+		UPDATE RESERVE
+		   SET COMP_PAY = #{compPayFlag} /*결제완료 여부(null: 결제중사용자 취소, 0:결제완료, 1:결제대기중(무통장입금의 경우), 3:고객전체취소(Card), 4:고객부분취소(Card), 5:고객전체환불(가상계좌, 무통장), 6:고객부분환불(가상계좌, 무통장), 8:관리자가 예약등록, 9:관리자가 예약취소, 이니시스 승인상태에 따라 추가)*/
+		 WHERE RSV_ID = #{orderNumber}
+		]]>
+	</update>
+	
+	<select id="selectReserveTableTelQuery" parameterType="Map">
+		/*queryID = openApiManage.selectReserveTableTelQuery*/
+		<![CDATA[
+		SELECT RSV_ID as rsvId
+			 , PAY_AMT as payAmt
+			 , PAY_VAT as payVat
+			 , CUST_NAME as custName
+			 , CUST_MOBILE as custMobile
+			 , CUST_EMAIL as custEmail
+			 , COMP_PAY as compPay
+		  FROM RESERVE
+		 WHERE COMP_PAY = #{compPayFlag}
+		   AND RSV_ID = #{orderNumber}
+		]]>
+	</select>
+
+	<delete id="deleteReserveTable" parameterType="Map">
+		/*queryID = openApiManage.deleteReserveTable*/
+		<![CDATA[
+		DELETE FROM RESERVE
+		 WHERE RSV_ID = #{orderNumber}
+		]]>
+	</delete>
+
+	<delete id="deleteOrderMenuTable" parameterType="Map">
+		/*queryID = openApiManage.deleteOrderMenuTable*/
+		<![CDATA[
+		DELETE FROM ORDER_MENU
+		 WHERE RSV_ID = #{orderNumber}
+		]]>
+	</delete>
+
+	<delete id="deleteRsvTable" parameterType="Map">
+		/*queryID = openApiManage.deleteRsvTable*/
+		<![CDATA[
+		DELETE FROM RSVTABLE
+		 WHERE RSV_ID = #{orderNumber}
+		]]>
+	</delete>
+
+	<delete id="deletePaymentTable" parameterType="Map">
+		/*queryID = openApiManage.deletePaymentTable*/
+		<![CDATA[
+		DELETE FROM PAYMENT
+		 WHERE RSV_ID = #{orderNumber}
+		]]>
+	</delete>
+	
+	<update id="updatePaymentTable" parameterType="Map">
+		/*queryID = openApiManage.updatePaymentTable*/
+		<![CDATA[
+		UPDATE PAYMENT
+		   SET AMT_INPUT = #{amtInput}
+			 , NM_INPUTBANK = #{nmInputbank}
+			 , NM_INPUT = #{nmInput}
+			 , DT_TRANS = #{dtTrans}
+			 , TM_TRANS = #{tmTrans}
+			 , DT_INPUTSTD = #{dtInputstd}
+			 , DT_CALCULSTD = #{dtCalculstd}
+			 , DT_TRANSBASE = #{dtTransbase}
+		 WHERE RSV_ID = #{noOid}
+		   AND INICIS_VACT_NUM = ${noVacct}
+		]]>
+	</update>
+<!--		   AND INICIS_VACT_BANKNAME = #{nmInputbank} -->
+<!--		   /* AND INICIS_TID = ${noTid} */ -->
+
+	<!-- 전체취소(Card) -->
+	<update id="updateAllCardRefundPayment" parameterType="Map">
+		/*queryID = openApiManage.updateAllCardRefundPayment*/
+		<![CDATA[
+		UPDATE PAYMENT
+		   SET REFD_RESULTCODE = #{resultCode}
+		   	 , REFD_RESULTMSG = #{resultMsg}
+		   	 , REFD_CANCELDATE = #{cancelDate}
+		   	 , REFD_CANCELTIME = #{cancelTime}
+		   	 , REFD_CSHRCANCELNUM = #{cshrCancelNum}
+		   	 , REFD_DETAILRESULTCODE = #{detailResultCode}
+		   	 , REFD_RECEIPTINFO = #{receiptInfo}
+		 WHERE INICIS_TID = #{tid}
+		]]>
+	</update>
+
+	<!-- 부분최소(Card) -->
+	<update id="updatePatialCardRefundPayment" parameterType="Map">
+		/*queryID = openApiManage.updatePatialCardRefundPayment*/
+		<![CDATA[
+		UPDATE PAYMENT
+		   SET REFD_RESULTCODE = #{resultCode}
+		   	 , REFD_RESULTMSG = #{resultMsg}
+		   	 , REFD_PRTCDATE = #{prtcDate}
+		   	 , REFD_PRTCTIME = #{prtcTime}
+		   	 , PREFD_TID = #{tid}
+		   	 , PREFD_PRTCTID = #{prtcTid}
+			 , PREFD_PRTCPRICE = #{prtcPrice}
+			 , PREFD_PRTCREMAINS = #{prtcRemains}
+			 , PREFD_PRTCCNT = #{prtcCnt}
+			 , PREFD_PRTCTYPE = #{prtcType}
+			 , PREFD_POINTAMOUNT = #{pointAmount}
+			 , PREFD_DISCOUNTAMOUNT = #{discountAmount}
+			 , PREFD_CREDITAMOUNT = #{creditAmount}
+			 , PREFD_CASHRECEIPTAMOUNT = #{cashReceiptAmount}
+		 WHERE INICIS_TID = #{prtcTid}
+		]]>
+	</update>
+
+	<!-- 전체환불(가상계좌, 무통장) update Query -->
+	<update id="updateAllGitaRefundPayment" parameterType="Map">
+		/*queryID = openApiManage.updateAllGitaRefundPayment*/
+		<![CDATA[
+		UPDATE PAYMENT
+		   SET REFD_RESULTCODE = #{resultCode}
+		   	 , REFD_RESULTMSG = #{resultMsg}
+		   	 , REFD_CANCELDATE = #{cancelDate}
+		   	 , REFD_CANCELTIME = #{cancelTime}
+		   	 , REFD_CSHRCANCELNUM = #{cshrCancelNum}
+		   	 , REFD_DETAILRESULTCODE = #{detailResultCode}
+		   	 , REFD_RECEIPTINFO = #{receiptInfo}
+		 WHERE INICIS_TID = #{tid}
+		]]>
+	</update>
+
+	<!-- 부분환불(가상계좌, 무통장) update Query -->
+	<update id="updatePatialGitaRefundPayment" parameterType="Map">
+		/*queryID = openApiManage.updatePatialGitaRefundPayment*/
+		<![CDATA[
+		UPDATE PAYMENT
+		   SET REFD_RESULTCODE = #{resultCode}
+		   	 , REFD_RESULTMSG = #{resultMsg}
+		   	 , REFD_PRTCDATE = #{prtcDate}
+		   	 , REFD_PRTCTIME = #{prtcTime}
+		   	 , PREFD_TID = #{tid}
+		   	 , PREFD_PRTCTID = #{prtcTid}
+		   	 , PREFD_PRTCPRICE = #{prtcPrice}
+		   	 , PREFD_PRTCREMAINS = #{prtcRemains}
+		   	 , PREFD_PRTCCNT = #{prtcCnt}
+		 WHERE INICIS_TID = #{prtcTid}
+		]]>
+	</update>
+
+
+<!-- 사용하지 않음 -->
+	<update id="updateReservePensionInfo" parameterType="Map">
+		/*queryID = openApiManage.updateReservePensionInfo*/
+		<![CDATA[
+		UPDATE PAYMENT
+		   SET AMT_INPUT = #{amtInput}
+			 , NM_INPUTBANK = #{nmInputbank}
+			 , NM_INPUT = #{nmInput}
+			 , DT_TRANS = #{dtTrans}
+			 , TM_TRANS = #{tmTrans}
+			 , DT_INPUTSTD = #{dtInputstd}
+			 , DT_CALCULSTD = #{dtCalculstd}
+			 , DT_TRANSBASE = #{dtTransbase}
+		 WHERE RSV_ID = #{noOid}
+		   AND INICIS_VACT_NUM = ${noVacct}
+		   AND INICIS_VACT_BANKNAME = #{nmInputbank}
+		]]>
+	</update>
+<!-- 사용하지 않음 -->
+
+</mapper>
